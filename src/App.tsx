@@ -1,25 +1,35 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import {ReactElement, useCallback} from 'react';
+import {DefaultTheme, ThemeProvider} from 'styled-components';
+import {BrowserRouter} from 'react-router-dom';
+import {Header} from './components/Header';
 
-function App() {
+import GlobalStyle from './global';
+import {Routes} from './routes';
+
+import light from './global/themes/light';
+import dark from './global/themes/dark';
+import {usePersistedState} from './usePersistedState';
+
+function App(): ReactElement {
+  const [theme, setTheme] = usePersistedState<DefaultTheme>('theme', light);
+
+  const toggleTheme = useCallback(() => {
+    setTheme(theme.title === 'light' ? dark : light);
+  }, [setTheme, theme.title]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ThemeProvider theme={theme}>
+      <GlobalStyle />
+      <BrowserRouter>
+        <Header
+          toggleTheme={toggleTheme}
+          title={theme.title}
+          primary={theme.colors.primary}
+          secundary={theme.colors.secundary}
+        />
+        <Routes />
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 
